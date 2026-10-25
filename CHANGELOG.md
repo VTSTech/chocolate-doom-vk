@@ -11,6 +11,23 @@ matching).
 
 ## [Unreleased]
 
+### Changed
+- **Aspect and base-resolution hotkeys moved off the vanilla F-keys.**
+  The Vulkan presenter's dispatch in `I_GetEvent()` ran before the
+  engine's responders, so while the Vulkan path was live its hotkeys
+  shadowed real vanilla features: F11 is the gamma/brightness cycle in
+  Doom, Heretic and Hexen, and F12 is the spy camera in Doom/Heretic
+  (dev-map reload in Hexen) — none of those reached the game. The
+  aspect cycle moves to **Alt+A** and the shader base-resolution cycle
+  to **Alt+B**, following the same Alt-combo convention as the fork's
+  Alt+Enter fullscreen shortcut. The letter is intercepted only with
+  Alt held and only while the Vulkan path is active: plain A/B pass
+  through, F11/F12 always reach the engine (even mid-VK-run), and with
+  `-novulkan` the Alt-combos fall through untouched. Alt is still the
+  strafe modifier — same as Alt+Enter, harmless unless a movement key
+  is held simultaneously. PrintScreen (screenshot) and Scroll Lock
+  (stats overlay) are unchanged.
+
 ## [3.0.4] - 2026-10-24
 
 The Vulkan presenter gets frame-pacing controls: a presents-per-second

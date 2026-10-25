@@ -110,7 +110,7 @@ void I_VK_SetPalette(const SDL_Color *palette);
 // From HandleWindowEvent(SDL_WINDOWEVENT_RESIZED).
 void I_VK_FlagResize(void);
 
-// Runtime aspect toggle (F11): cycles the feed 4:3 -> 16:10 -> 16:9 ->
+// Runtime aspect toggle (Alt+A): cycles the feed 4:3 -> 16:10 -> 16:9 ->
 // 4:3 — 320x240 (authentic VGA mode 13h stretch), raw 320x200 square
 // pixels, then 356x200 (16:9 widescreen column stretch). Persisted as the
 // tri-state aspect_ratio_correct (0 / 1 / 2); the classic renderer only
@@ -118,15 +118,18 @@ void I_VK_FlagResize(void);
 void I_VK_ToggleAspect(void);
 
 // Current aspect mode name ("4:3" / "16:10" / "16:9") for the stats
-// overlay's feed row and the F11 feedback flash.
+// overlay's feed row and the Alt+A feedback flash.
 const char *I_VK_AspectName(void);
 
 // Runtime hotkeys (from I_GetEvent, VK path only):
 // PrintScreen -> I_VK_RequestCapture: read back the next presented frame
 // to the first free vkshotNNN.tga (same channel-correct TGA writer as
-// -vkcapture). F12 -> I_VK_CycleBase: cycle the shader base multiplier
+// -vkcapture). Alt+B -> I_VK_CycleBase: cycle the shader base multiplier
 // 1x -> 2x -> 3x -> 4x -> 1x (persisted through shader_base_resolution;
 // the input image re-creates and the chain re-derives on the next frame).
+// The Alt+letter hotkeys are eaten only with Alt held and only while the
+// Vulkan path is live — plain letters and the vanilla F11/F12 features
+// (gamma cycle, spy camera) reach the game untouched.
 void I_VK_RequestCapture(void);
 void I_VK_CycleBase(void);
 

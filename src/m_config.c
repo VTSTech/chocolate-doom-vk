@@ -771,7 +771,7 @@ static default_t extra_defaults_list[] =
     // to the Vulkan shader chain, as a pixel width. 0 or 320 = native
     // (320x240, or 320x200 raw); 640 = doubled; 960 = tripled; 1280 =
     // quadrupled. The multiplier 1..4 is also accepted, and is the form
-    // the in-game F12 cycle persists. The frame is nearest-neighbor
+    // the in-game Alt+B cycle persists. The frame is nearest-neighbor
     // upscaled to this size before the preset runs. Vulkan path only.
     // (Chocolate Doom VK)
     //

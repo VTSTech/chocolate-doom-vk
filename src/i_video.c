@@ -460,8 +460,14 @@ void I_GetEvent(void)
                     break;
                 }
                 if (I_VK_Active()
-                    && sdlevent.key.keysym.scancode == SDL_SCANCODE_F11)
+                    && sdlevent.key.keysym.scancode == SDL_SCANCODE_A
+                    && (sdlevent.key.keysym.mod & KMOD_ALT) != 0)
                 {
+                    // Alt+A cycles the feed aspect. The letter is eaten
+                    // only with Alt held (the Alt+Enter convention) and
+                    // only while the Vulkan path is live — plain A and
+                    // every vanilla binding (F11 gamma, F12 spy) reach
+                    // the game untouched.
                     I_VK_ToggleAspect();
                     break;
                 }
@@ -472,8 +478,12 @@ void I_GetEvent(void)
                     break;
                 }
                 if (I_VK_Active()
-                    && sdlevent.key.keysym.scancode == SDL_SCANCODE_F12)
+                    && sdlevent.key.keysym.scancode == SDL_SCANCODE_B
+                    && (sdlevent.key.keysym.mod & KMOD_ALT) != 0)
                 {
+                    // Alt+B cycles the shader base resolution (same
+                    // gating as Alt+A above; vanilla F12 spy camera is
+                    // left alone).
                     I_VK_CycleBase();
                     break;
                 }
@@ -1656,7 +1666,7 @@ void I_InitGraphics(void)
         fullscreen = true;
     }
 
-    // aspect_ratio_correct is tri-state on the Vulkan presenter (F11:
+    // aspect_ratio_correct is tri-state on the Vulkan presenter (Alt+A:
     // 1 = 4:3, 0 = 16:10 raw, 2 = 16:9 widescreen). The classic renderer
     // only understands 0/1, so any nonzero value — including a persisted
     // 2 from a Vulkan run — renders as corrected 4:3 here.

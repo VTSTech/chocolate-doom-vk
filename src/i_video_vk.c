@@ -603,7 +603,7 @@ static boolean RecreateSwapchain(void)
 // 356x200 16:9 widescreen stretch (column map)
 // ------------------------------------------------------------------
 
-// Aspect mode name for the stats overlay (i_overlay.c) and the F11
+// Aspect mode name for the stats overlay (i_overlay.c) and the Alt+A
 // feedback: aspect_ratio_correct 1 = "4:3", 0 = "16:10" (raw square
 // pixels), 2 = "16:9" (widescreen column stretch).
 const char *I_VK_AspectName(void)
@@ -1263,9 +1263,9 @@ void I_VK_ToggleAspect(void)
     // EnsureInputImage() picks the new size up on the next frame.
 }
 
-// F12: cycle the shader base multiplier 1x -> 2x -> 3x -> 4x -> 1x. The
+// Alt+B: cycle the shader base multiplier 1x -> 2x -> 3x -> 4x -> 1x. The
 // new value is written back into shader_base_resolution (multiplier form)
-// so the choice persists through the config file like the F11 aspect
+// so the choice persists through the config file like the Alt+A aspect
 // flip does; EnsureInputImage() re-creates the input image and the chain
 // re-derives its pass FBOs from the per-frame input size on the next
 // render — the same M4 contract the aspect toggle rides on.

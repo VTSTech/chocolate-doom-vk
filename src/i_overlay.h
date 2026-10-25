@@ -24,7 +24,7 @@ extern int vkstats;
 void I_OverlayToggle(void);
 
 // Show a short-lived message row in the overlay box (2 seconds) — the
-// on-screen feedback for the PrintScreen screenshot and F12 base-cycle
+// on-screen feedback for the PrintScreen screenshot and Alt+B base-cycle
 // hotkeys, so the action is confirmed without leaving the game.
 void I_OverlayFlash(const char *fmt, ...);
 

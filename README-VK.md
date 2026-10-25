@@ -107,10 +107,10 @@ Presets can also be browsed in-game — see "Shader browser" below.
 | `-novulkan` | Force the classic SDL2 renderer for this run (`usevulkan = 0` persists) |
 | `-noaspect` | Feed raw 320x200 (16:10) instead of the authentic 4:3 stretch |
 | `-vkbase <n>` | Shader base resolution: 2/3/4 = doubled/tripled/quadrupled chain input (or a pixel width, e.g. `640`); persists in `shader_base_resolution` |
-| **F11** (in-game) | Cycle aspect 4:3 → 16:10 → 16:9 live; feed re-creates, chain re-derives |
+| **Alt+A** (in-game) | Cycle aspect 4:3 → 16:10 → 16:9 live; feed re-creates, chain re-derives (vanilla F11 gamma stays put) |
 | **Scroll Lock** (in-game) | Toggle the stats overlay (below) |
 | **PrintScreen** (in-game) | Screenshot: read back the next presented frame to the first free `vkshotNNN.tga` (same channel-correct TGA writer as `-vkcapture`) |
-| **F12** (in-game) | Cycle the shader base resolution 1x → 2x → 3x → 4x → 1x (persists in `shader_base_resolution`) |
+| **Alt+B** (in-game) | Cycle the shader base resolution 1x → 2x → 3x → 4x → 1x (persists in `shader_base_resolution`; vanilla F12 spy stays put) |
 | `-novkstats` | Start with the stats overlay off (`vkstats = 0` persists) |
 | `-vkdebug` | Enable the Vulkan validation layer for this run |
 | `-vkcapture <n>` | Dump the n-th presented frame to `vkframe.tga` |
@@ -171,7 +171,7 @@ crt-easymode | 3 passes
   with its pass count; a configured preset that failed to start is shown
   as `(unused)`, `no shader` when none is set.
 - Row 4 is the smoothed frame rate and frame time, plus the feed mode
-  (`320x240 4:3`, `320x200 16:10` or `356x200 16:9`, the state F11
+  (`320x240 4:3`, `320x200 16:10` or `356x200 16:9`, the state Alt+A
   cycles; with a base multiplier active it shows the enlarged canvas,
   e.g. `640x480 4:3 (2x)`).
   Under normal play the engine caps rendering at its 35 Hz tic rate — that
@@ -188,14 +188,17 @@ that Scroll Lock is intercepted by the overlay toggle and therefore
 not available for game bindings while this fork runs.
 
 The hotkeys report back through the overlay itself: **PrintScreen**,
-**F12** and **F11** each add a short-lived amber feedback row to the box
-for two seconds — `shot vkshot000.tga` / `base 640x480 (2x)` /
+**Alt+B** and **Alt+A** each add a short-lived amber feedback row to the
+box for two seconds — `shot vkshot000.tga` / `base 640x480 (2x)` /
 `aspect 16:9` — so the action is confirmed without leaving the game.
-While the Vulkan path is live,
-F11 (vanilla: gamma) is the aspect toggle and F12 (vanilla: demo/net
-spy camera) is the base-resolution cycle; PrintScreen is unused by the
-vanilla game. All three only intercept while the Vulkan path is active
-— with `-novulkan` the keys fall through to the game unchanged.
+While the Vulkan path is live, **Alt+A** is the aspect toggle and
+**Alt+B** is the base-resolution cycle — the same Alt-combo convention
+as Alt+Enter fullscreen. The letter is intercepted only with Alt held
+and only while the Vulkan path is active, so the vanilla F-keys keep
+their jobs: F11 remains the gamma/brightness cycle (Doom, Heretic,
+Hexen) and F12 the spy camera (Doom, Heretic; dev-map reload in Hexen).
+PrintScreen is unused by the vanilla game; with `-novulkan` the
+Alt-combos fall through to the game untouched as well.
 
 ## The frame feed and aspect handling
 
@@ -214,7 +217,7 @@ tri-state `aspect_ratio_correct`:
 
 libslang-vk's aspect-corrected viewport derives its letterbox from the
 feed shape (SPEC F6), so a 16:9 feed fills a 16:9 display edge to edge
-(and letterboxes correctly on anything else). **F11 cycles the three
+(and letterboxes correctly on anything else). **Alt+A cycles the three
 modes live** — 4:3 → 16:10 → 16:9 → back — and the choice persists
 through the config file like every other setting. The value `2` is a
 Vulkan-path-only mode: if the run falls back to the classic SDL2
@@ -250,7 +253,7 @@ Notes:
   in); walls and sprites stay on a consistent projection, and the
   weapon sprite scales with the same factor while staying anchored
   to the bottom of the view.
-- The 16:9 / 16:10 aspect modes (F11) stretch the finished frame;
+- The 16:9 / 16:10 aspect modes (Alt+A) stretch the finished frame;
   they do not add field of view. The slider measures the FOV of the
   internal 320-wide 4:3 frame.
 - Saved as `fov` in each game's config file; purely visual, so
@@ -276,9 +279,9 @@ build/src/chocolate-doom -iwad DOOM.WAD -shader crt/crtglow_lanczos.slangp -vkba
 #   shader_base_resolution     960
 ```
 
-**F12 cycles the multiplier live** while the game runs — 1x → 2x → 3x
+**Alt+B cycles the multiplier live** while the game runs — 1x → 2x → 3x
 → 4x → back to 1x — riding the same re-create-and-re-derive path as the
-F11 aspect toggle: the input image is rebuilt at the new size, the chain
+Alt+A aspect toggle: the input image is rebuilt at the new size, the chain
 re-derives every pass FBO from the per-frame input, the overlay's mode
 row updates immediately, and the choice persists through
 `shader_base_resolution` (multiplier form) on exit.
@@ -317,7 +320,7 @@ I_VK: shader base resolution 2x — feed 320x240 -> base 640x480 (DevilutionX-st
 I_VK: feed 320x240 (4:3), base 640x480, swapchain 1920x1080, present FIFO
 ```
 
-The F11 aspect toggle composes with it (base follows the feed: 640×480 ↔
+The Alt+A aspect toggle composes with it (base follows the feed: 640×480 ↔
 640×400 ↔ 712×400), and the overlay's mode row always shows the live
 canvas.
 
