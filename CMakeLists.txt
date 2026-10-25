@@ -145,7 +145,7 @@ if(PNG_FOUND)
 endif()
 
 # Check for FluidSynth.
-find_package(FluidSynth)
+find_package(FluidSynth 2.2.0)
 if(FluidSynth_FOUND AND ENABLE_SDL2_MIXER)
     set(HAVE_FLUIDSYNTH TRUE)
 endif()
