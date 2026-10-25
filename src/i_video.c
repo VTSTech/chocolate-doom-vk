@@ -1313,6 +1313,21 @@ void I_GraphicsCheckCommandLine(void)
     //!
     // @category video
     //
+    // Echo the Vulkan path's log stream (the "I_VK: ..." lines) to the
+    // console while gpu-scaler.log is being written. Default is off:
+    // the log file is the durable home and the terminal this game was
+    // started from stays clean. Console echo happens automatically
+    // when the log file cannot be opened.
+    //
+
+    if (M_ParmExists("-vklog"))
+    {
+        vk_log_console = 1;
+    }
+
+    //!
+    // @category video
+    //
     // Disable the on-screen stats overlay (FPS, graphics
     // backend, active shader) for this run. Scroll Lock
     // toggles it at runtime.
@@ -2124,4 +2139,5 @@ void I_BindVideoVariables(void)
     M_BindIntVariable("shader_base_resolution",  &shader_base_resolution);
     M_BindIntVariable("vk_fps_cap",                 &vk_fps_cap);
     M_BindIntVariable("vk_present_mode",            &vk_present_mode);
+    M_BindIntVariable("vk_log_console",            &vk_log_console);
 }

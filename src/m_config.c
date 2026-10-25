@@ -809,6 +809,17 @@ static default_t extra_defaults_list[] =
     CONFIG_VARIABLE_INT(vk_present_mode),
 
     //!
+    // Echo the Vulkan path's log stream (the "I_VK: ..." lines) to the
+    // console while gpu-scaler.log is being written. 0 = off, the
+    // default: the log file is the durable home and the terminal the
+    // game was started from stays clean. Console echo happens
+    // automatically when the log file cannot be opened. The -vklog
+    // command-line switch sets this for one run. (Chocolate Doom VK)
+    //
+
+    CONFIG_VARIABLE_INT(vk_log_console),
+
+    //!
     // If non-zero, the screen will have smooth scaling.
     //
 

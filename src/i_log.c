@@ -32,6 +32,11 @@
 static FILE *log_file = NULL;
 static char log_path[I_LOG_PATH_MAX] = "";
 
+// Console echo switch (vk_log_console / -vklog, see i_log.h). Bound to
+// the config var from I_BindVideoVariables; read per write, so a value
+// from default.cfg or the command line is honoured whenever it lands.
+int vk_log_console = 0;
+
 // Set by the first I_LogInit call: init runs once per process, later
 // attempts (video re-init) reuse the already-open session.
 static boolean log_tried = false;
@@ -50,6 +55,22 @@ static void TimestampPrefix(char *out, size_t out_size)
     {
         M_StringCopy(out, "[??:??:??] ", out_size);
     }
+}
+
+// Should this entry also go to the console? Two cases say yes: the
+// user asked for it (vk_log_console, -vklog), or there is no durable
+// home — when the log file could not be opened the console is the
+// only place the message will ever exist, exactly the situation the
+// module was built for (a Windows GUI-subsystem binary whose stderr
+// is invisible has no console to pollute, and a terminal run without
+// a log prefers noisy over blind). The default, healthy case — file
+// open, echo off — keeps the terminal clean: the game must not spray
+// its log over the shell it was started from (2026-10-26 field
+// report: I_VK lines interleaved with the startup dots made a wall
+// of text and left the cursor stranded mid-scroll on exit).
+static boolean ConsoleEcho(void)
+{
+    return vk_log_console != 0 || log_file == NULL;
 }
 
 // Render one entry and append it — stamp first, newline last, flushed
@@ -187,7 +208,10 @@ void I_LogPrintf(const char *fmt, ...)
 
     va_start(args, fmt);
     va_copy(copy, args);
-    vprintf(fmt, args);
+    if (ConsoleEcho())
+    {
+        vprintf(fmt, args);
+    }
     va_end(args);
     LogWrite(fmt, copy);
     va_end(copy);
@@ -199,7 +223,10 @@ void I_LogError(const char *fmt, ...)
 
     va_start(args, fmt);
     va_copy(copy, args);
-    vfprintf(stderr, fmt, args);
+    if (ConsoleEcho())
+    {
+        vfprintf(stderr, fmt, args);
+    }
     va_end(args);
     LogWrite(fmt, copy);
     va_end(copy);

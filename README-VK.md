@@ -389,10 +389,10 @@ What lands there:
   snapshot — preset path, `aspect_ratio_correct`,
   `shader_base_resolution`, `vk_debug` — written before anything can
   fail;
-- every message the Vulkan path prints to the console, unchanged
-  (init steps, the `libslang-vk active — …` banner, cache hit/compile
-  counts, aspect and base-resolution changes, screenshot confirmations,
-  device-lost recovery);
+- every message the Vulkan path writes as it works (init steps, the
+  `libslang-vk active — …` banner, cache hit/compile counts, aspect and
+  base-resolution changes, screenshot confirmations, device-lost
+  recovery);
 - every **fallback reason** (one guaranteed line per failed init —
   "no shader preset configured", "SDL2 has no Vulkan support", "preset
   failed to load", …), even when the classic renderer takes over and
@@ -400,18 +400,26 @@ What lands there:
 - the final `I_Error` text when a run dies fatally — device-lost
   recovery failing, for instance.
 
-Console output is unchanged (Linux terminals see exactly what they saw
-before); the file is additive. Logging is best-effort by design: a
-read-only directory disables it with one console note and never fails
-the game. Builds with `ENABLE_VK_SHADERS=OFF` never create a log.
+The terminal is left alone: the file is the log's only destination by
+default. A run started from a shell used to end with the `I_VK: …`
+stream scattered over the console (unbuffered stderr interleaving with
+the startup progress dots); now that stream goes to `gpu-scaler.log`
+and the console stays clean. To watch it live, echo it back — set
+`vk_log_console 1` in `default.cfg` or pass **`-vklog`** on the command
+line, and every line lands on stdout/stderr as it is written. Echo also
+switches itself on automatically when the log file cannot be opened:
+with no durable home, the console is the only witness. Logging is
+best-effort by design and never fails the game. Builds with
+`ENABLE_VK_SHADERS=OFF` never create a log.
 
 ## Fallback behavior
 
 Every failure path — no Vulkan loader, device creation refused, the preset
-file missing or failing to parse — prints one explanatory line and drops
-back to the classic SDL2 renderer for that run; the same reason is
-recorded in `gpu-scaler.log` (see above), where the detailed per-step
-errors from the failed init are too.
+file missing or failing to parse — records one explanatory line in
+`gpu-scaler.log` and drops back to the classic SDL2 renderer for that
+run; the detailed per-step errors from the failed init are in the same
+file. (The lines reach the console too when `-vklog` is set or when the
+log file itself could not be opened.)
 
 A **device lost** event (driver reset, Windows TDR) once the chain is
 live is no longer fatal: the library rebuilds its side (device, the

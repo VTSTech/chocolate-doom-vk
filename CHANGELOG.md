@@ -11,7 +11,27 @@ matching).
 
 ## [Unreleased]
 
+### Added
+- **`vk_log_console` config variable / `-vklog` switch — console echo
+  for the session log.** Echoes the Vulkan path's log stream (the
+  `I_VK: …` lines) to stdout/stderr as each line is written, for live
+  debugging from a terminal; `gpu-scaler.log` keeps every line either
+  way.
+
 ### Changed
+- **The Vulkan path no longer mirrors its log onto the terminal.**
+  `I_LogPrintf`/`I_LogError` used to write every `I_VK: …` line to
+  stdout/stderr in addition to `gpu-scaler.log` — a behaviour meant
+  for Windows GUI-subsystem builds, where the console is invisible
+  anyway. From a Linux terminal it meant a wall of scattered output:
+  unbuffered stderr interleaved with the startup progress dots' bare
+  `.`, and the mess sat there when the game exited. The log file is
+  now the only destination by default; echo is opt-in
+  (`vk_log_console` / `-vklog`) and comes back automatically when the
+  log file cannot be opened, so a run with no durable home still
+  explains itself on the console. Fatal `I_Error` output is
+  unaffected (it writes stderr directly and always has).
+
 - **Aspect and base-resolution hotkeys moved off the vanilla F-keys.**
   The Vulkan presenter's dispatch in `I_GetEvent()` ran before the
   engine's responders, so while the Vulkan path was live its hotkeys
