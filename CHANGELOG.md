@@ -48,6 +48,22 @@ matching).
   is held simultaneously. PrintScreen (screenshot) and Scroll Lock
   (stats overlay) are unchanged.
 
+### Fixed
+- **Linux CI smoke test reads the session log again.** The smoke step
+  grepped the console for the `I_VK` stream that the console-silencing
+  change moved into `gpu-scaler.log`, so the first post-3.0.5 master
+  run failed at the assertions, not in the game (both Windows jobs and
+  every build step stayed green). The step now pins `XDG_DATA_HOME`
+  (SDL_GetPrefPath honours it) and gates the Vulkan assertions on the
+  session log — while additionally asserting the new contract in the
+  other direction: the console must NOT carry `I_VK` lines. The
+  packaged `README.txt` inside the Linux artifact no longer tells
+  players to press F11/F12 for aspect/base-resolution (Alt+A / Alt+B
+  since the hotkey move) and now names the real log location
+  (`~/.local/share/chocolate-doom/` on Linux, next to the binaries on
+  Windows). Verified locally by re-running the smoke step against
+  lavapipe: session log complete, console clean, capture frame good.
+
 ## [3.0.4] - 2026-10-24
 
 The Vulkan presenter gets frame-pacing controls: a presents-per-second

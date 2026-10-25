@@ -5,8 +5,7 @@ name: VK shaders (libslang-vk)
 # - Linux: full build with ENABLE_VK_SHADERS=ON, then a real game run on
 #   lavapipe (software Vulkan) under Xvfb: freedoom + demo preset through
 #   the preset chain, frame capture via -vkcapture, plus a compile check of
-#   the ENABLE_VK_SHADERS=OFF fallback. Upstream's main.yml (autotools,
-#   classic renderer) is left untouched.
+#   the ENABLE_VK_SHADERS=OFF fallback.
 # - Windows MSYS2 (UCRT64, MinGW): CMake build; the zip step must glob real
 #   files — a bare "." argument makes Info-ZIP exit 12 ("Nothing to do").
 # - Windows MSVC (vcpkg): vcpkg is cloned at the release tag whose commit
@@ -62,6 +61,12 @@ jobs:
              build/_deps/libslang-vk-src/examples/presets/shaders/demo_downsample.slang \
              build/_deps/libslang-vk-src/examples/presets/shaders/demo_glow_combine.slang \
              smoke/shaders/
+          # Pin the config dir so gpu-scaler.log lands in the workspace
+          # (SDL_GetPrefPath honours XDG_DATA_HOME on Linux). The Vulkan
+          # path logs to the file only — the console mirror became opt-in
+          # (-vklog) in 3.0.5 — so the I_VK assertions gate on the file,
+          # and console silence is asserted as a feature.
+          export XDG_DATA_HOME="$PWD/xdg-data"
           cd smoke
           xvfb-run -a -s "-screen 0 1024x768x24" \
             stdbuf -oL -eL timeout -s KILL 90 \
@@ -70,12 +75,20 @@ jobs:
               -shader demo-bright.slangp \
               -timedemo demo1 -window -2 -nosound -nomusic \
               -vkcapture 240 > smoke.log 2>&1 || true
-          echo "--- key lines ---"
-          grep -E "I_VK|timed" smoke.log || { echo "MISSING I_VK LINES"; cat smoke.log; exit 1; }
-          grep -q "libslang-vk active" smoke.log
-          grep -q "captured frame" smoke.log
-          grep -q "timed" smoke.log
-          grep -qE "Validation|VUID" smoke.log && { echo "VALIDATION MESSAGES FOUND"; exit 1; } || true
+          LOG="$XDG_DATA_HOME/chocolate-doom/gpu-scaler.log"
+          echo "--- session log: $LOG ---"
+          test -s "$LOG"
+          grep -q "libslang-vk active" "$LOG"
+          grep -q "captured frame" "$LOG"
+          echo "--- console ---"
+          # Vanilla output still reaches the console...
+          grep -E "timed" smoke.log
+          # ...and the I_VK stream does not (that is the 3.0.5 contract).
+          if grep -qE "I_VK" smoke.log; then
+            echo "CONSOLE NOT CLEAN — I_VK lines reached stdout/stderr"; exit 1
+          fi
+          # Validation messages would land on either stream.
+          grep -qE "Validation|VUID" smoke.log "$LOG" && { echo "VALIDATION MESSAGES FOUND"; exit 1; } || true
           test -s vkframe.tga
           echo "SMOKE OK: $(file vkframe.tga)"
 
@@ -152,10 +165,12 @@ jobs:
           -iwad.
 
           Key flags: -shader <preset.slangp> (Vulkan shader chain),
-          -novulkan, -vkcapture <n>, Scroll Lock toggles the stats
-          overlay, F11 cycles aspect, F12 cycles shader base
-          resolution, PrintScreen takes a screenshot. Everything is
-          logged to gpu-scaler.log next to the binaries.
+          -novulkan, -vkcapture <n>, -vklog (echo the log stream to the
+          console), Scroll Lock toggles the stats overlay, Alt+A cycles
+          aspect, Alt+B cycles shader base resolution, PrintScreen takes
+          a screenshot. Everything is logged to gpu-scaler.log in the
+          config directory (~/.local/share/chocolate-doom/ on Linux,
+          next to the binaries on Windows).
 
           See README-VK.md in the repository for full documentation.
           EOF
